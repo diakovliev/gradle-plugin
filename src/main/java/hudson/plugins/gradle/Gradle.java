@@ -30,10 +30,13 @@ public class Gradle extends Builder implements DryRun {
     private final boolean makeExecutable;
     private final boolean fromRootBuildScriptDir;
     private final boolean useWorkspaceAsHome;
+    private final Result successResult;
+    private final Result failedResult;
 
     @DataBoundConstructor
     public Gradle(String description, String switches, String tasks, String rootBuildScriptDir, String buildFile,
-                  String gradleName, boolean useWrapper, boolean makeExecutable, boolean fromRootBuildScriptDir, boolean useWorkspaceAsHome) {
+                  String gradleName, boolean useWrapper, boolean makeExecutable, boolean fromRootBuildScriptDir, boolean useWorkspaceAsHome,
+                  Result successResult, Result failedResult) {
         this.description = description;
         this.switches = switches;
         this.tasks = tasks;
@@ -44,6 +47,8 @@ public class Gradle extends Builder implements DryRun {
         this.makeExecutable = makeExecutable;
         this.fromRootBuildScriptDir = fromRootBuildScriptDir;
         this.useWorkspaceAsHome = useWorkspaceAsHome;
+        this.successResult = successResult;
+        this.failedResult = failedResult;
     }
 
     @SuppressWarnings("unused")
@@ -263,15 +268,15 @@ public class Gradle extends Builder implements DryRun {
             }
             boolean success = r == 0;
             // if the build is successful then set it as success otherwise as a failure.
-            build.setResult(Result.SUCCESS);
+            build.setResult(successResult);
             if (!success) {
-                build.setResult(Result.FAILURE);
+                build.setResult(failedResult);
             }
-            return success;
+            return true;
         } catch (IOException e) {
             Util.displayIOException(e, listener);
             e.printStackTrace(listener.fatalError("command execution failed"));
-            build.setResult(Result.FAILURE);
+            build.setResult(failedResult);
             return false;
         }
     }
@@ -304,9 +309,23 @@ public class Gradle extends Builder implements DryRun {
         return (DescriptorImpl) super.getDescriptor();
     }
 
+    @SuppressWarnings("unused")
+    public Result getSuccessResult() {
+        return successResult;
+    }
+
+    @SuppressWarnings("unused")
+    public Result getFailedResult() {
+        return failedResult;
+    }
+
     @Extension
     public static final class DescriptorImpl extends BuildStepDescriptor<Builder> {
 
+        public static final String[] BUILD_RESULT_VALUES = {
+            Result.SUCCESS.toString(), Result.UNSTABLE.toString(), Result.FAILURE.toString(), Result.NOT_BUILT.toString(), Result.ABORTED.toString()
+        };
+        
         @CopyOnWrite
         private volatile GradleInstallation[] installations = new GradleInstallation[0];
 

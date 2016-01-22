@@ -50,5 +50,28 @@
         <f:checkbox default="false"/>
     </f:entry>
 
+    <f:advanced title="Advanced gradle build step properties">
+        
+        <f:entry title="${%Build result on success}" field="successResult" description="Build result what will be set when gradle script was successfully finished">
+            <select class="setting-input" name="successResult">
+                <j:getStatic var="resultSuccess" field="SUCCESS" className="hudson.model.Result"/>
+                <j:set var="buildStatus" value="${instance.successResult}" defaultValue="${resultSuccess}"/>
+                <j:forEach var="set_res_value" items="${descriptor.BUILD_RESULT_VALUES}">
+                    <f:option selected="${buildStatus==set_res_value}">${set_res_value}</f:option>
+                </j:forEach>
+            </select>
+        </f:entry>
+
+        <f:entry title="${%Build result on fail}" field="failedResult" description="Build result what will be set when gradle script was failed">
+            <select class="setting-input" name="failedResult">
+                <j:getStatic var="resultFailure" field="FAILURE" className="hudson.model.Result"/>
+                <j:set var="buildStatus" value="${instance.failedResult}" defaultValue="${resultFailure}"/>
+                <j:forEach var="set_res_value" items="${descriptor.BUILD_RESULT_VALUES}">
+                    <f:option selected="${buildStatus==set_res_value}">${set_res_value}</f:option>
+                </j:forEach>
+            </select>
+        </f:entry>
+        
+    </f:advanced>
 
 </j:jelly>

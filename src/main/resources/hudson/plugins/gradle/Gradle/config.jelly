@@ -49,7 +49,6 @@
     <f:entry title="${%Force GRADLE_USER_HOME to use workspace}" field="useWorkspaceAsHome">
         <f:checkbox default="false"/>
     </f:entry>
-
     <f:advanced title="Advanced gradle build step properties">
         
         <f:entry title="${%Build result on success}" field="successResult" description="Build result what will be set when gradle script was successfully finished">
@@ -69,7 +68,11 @@
                 </j:forEach>
             </select>
         </f:entry>
-        
+
+        <f:entry title="${%Pass build variables via gradle define}" field="passBuildVariablesViaGradleDefines">
+            <f:checkbox default="true"/>
+        </f:entry>
+
     </f:advanced>
 
 </j:jelly>

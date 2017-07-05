@@ -32,11 +32,12 @@ public class Gradle extends Builder implements DryRun {
     private final boolean useWorkspaceAsHome;
     private final Result successResult;
     private final Result failedResult;
+    private final boolean passBuildVariablesViaGradleDefines;
 
     @DataBoundConstructor
     public Gradle(String description, String switches, String tasks, String rootBuildScriptDir, String buildFile,
                   String gradleName, boolean useWrapper, boolean makeExecutable, boolean fromRootBuildScriptDir, boolean useWorkspaceAsHome,
-                  Result successResult, Result failedResult) {
+                  Result successResult, Result failedResult, boolean passBuildVariablesViaGradleDefines) {
         this.description = description;
         this.switches = switches;
         this.tasks = tasks;
@@ -49,6 +50,7 @@ public class Gradle extends Builder implements DryRun {
         this.useWorkspaceAsHome = useWorkspaceAsHome;
         this.successResult = successResult;
         this.failedResult = failedResult;
+        this.passBuildVariablesViaGradleDefines = passBuildVariablesViaGradleDefines;
     }
 
     @SuppressWarnings("unused")
@@ -223,10 +225,11 @@ public class Gradle extends Builder implements DryRun {
                 args.add(launcher.isUnix() ? GradleInstallation.UNIX_GRADLE_COMMAND : GradleInstallation.WINDOWS_GRADLE_COMMAND);
             }
         }
-        
-       
-        Set<String> sensitiveVars = build.getSensitiveBuildVariables();
-        args.addKeyValuePairs("-D", fixParameters(build.getBuildVariables()), sensitiveVars);
+
+        if (passBuildVariablesViaGradleDefines) {
+            Set<String> sensitiveVars = build.getSensitiveBuildVariables();
+            args.addKeyValuePairs("-D", fixParameters(build.getBuildVariables()), sensitiveVars);
+        }
         args.addTokenized(normalizedSwitches);
         args.addTokenized(normalizedTasks);
         if (buildFile != null && buildFile.trim().length() != 0) {

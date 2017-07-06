@@ -103,6 +103,11 @@ public class Gradle extends Builder implements DryRun {
         return useWorkspaceAsHome;
     }
 
+    @SuppressWarnings("unused")
+    public boolean isPassBuildVariablesViaGradleDefines() {
+        return passBuildVariablesViaGradleDefines;
+    }
+    
     public GradleInstallation getGradle() {
         for (GradleInstallation i : getDescriptor().getInstallations()) {
             if (gradleName != null && i.getName().equals(gradleName)) {
